@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.RolesAllowed;
 
+// TODO the mappings of the controller should be checked !!
 @RestController
 public class LoginController {
 

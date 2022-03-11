@@ -8,6 +8,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -31,9 +33,9 @@ class LoginControllerTest {
     }
 
     @Test
-    void greatUser() throws Exception {
-        mockMvc.perform(formLogin("/login").user("springuser").password("spring123"))
-                .andExpect(status().is3xxRedirection())
+    void userAuthenticated() throws Exception {
+        mockMvc.perform(formLogin("/login").user("springuser").password("springuser"))
+                .andExpect(authenticated())
                 .andDo(print());
     }
 
@@ -42,6 +44,17 @@ class LoginControllerTest {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Please sign in")))
+                .andDo(print());
+    }
+
+    // TODO seems to work but have to be analyzed deeper!!! Check the controller therefore.
+    // Why ist is it going to LoginController#getGithub() Handler????
+    @Test
+    void greetMockGitHubUser() throws Exception {
+
+        mockMvc.perform(get("/**").with(user("MockUser")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Welcome Github user")))
                 .andDo(print());
     }
 }
