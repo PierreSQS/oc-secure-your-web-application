@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.RolesAllowed;
 
-// TODO the mappings of the controller should be checked !!
 @RestController
 public class LoginController {
 
+    // Fixes the non-sens of the previous code!!!!!!
     @RolesAllowed("USER")
-    @GetMapping("**")
+    @GetMapping("user")
     public String greatUser() {
         return "Welcome User!";
     }
@@ -22,7 +22,8 @@ public class LoginController {
     }
 
 
-    @GetMapping("*")
+    // Fixes the non-sens of the previous code!!!!!!
+    @GetMapping("gituser")
     public String getGithub()
     {
         return "Welcome Github user!";

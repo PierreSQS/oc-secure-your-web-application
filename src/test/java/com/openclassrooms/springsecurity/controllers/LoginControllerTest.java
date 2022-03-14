@@ -47,14 +47,33 @@ class LoginControllerTest {
                 .andDo(print());
     }
 
-    // TODO seems to work but have to be analyzed deeper!!! Check the controller therefore.
-    // Why ist is it going to LoginController#getGithub() Handler????
+    // Fixes the non-sens of the previous commit!!!!!!
     @Test
     void greetMockGitHubUser() throws Exception {
 
-        mockMvc.perform(get("/**").with(user("MockUser")))
+        mockMvc.perform(get("/gituser").with(user("mockuser")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Welcome Github user")))
+                .andDo(print());
+    }
+
+    // New Test
+    @Test
+    void greetSpringUser() throws Exception {
+
+        mockMvc.perform(get("/user").with(user("mockuser")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Welcome User")))
+                .andDo(print());
+    }
+
+    // Fixes the non-sens of the previous commit!!!!!!
+    @Test
+    void greetAdminUser() throws Exception {
+
+        mockMvc.perform(get("/admin").with(user("mockadmin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Welcome Admin")))
                 .andDo(print());
     }
 }
