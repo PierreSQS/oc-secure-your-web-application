@@ -1,6 +1,5 @@
 package com.openclassrooms.springsecurity.controllers;
 
-import com.openclassrooms.springsecurity.configuration.SpringSecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,14 +7,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.isA;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,6 +46,14 @@ class LoginControllerIT {
     }
 
     @Test
+    void gitLoginOK() throws Exception {
+        mockMvc.perform(get("/gituser").with(oidcLogin()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Welcome Github user!"))
+                .andDo(print());
+    }
+
+    @Test
     void adminLoginOK() throws Exception {
         mockMvc.perform(formLogin("/login").user("springadmin").password("springadmin"))
                 .andExpect(status().is3xxRedirection())
@@ -75,6 +81,20 @@ class LoginControllerIT {
     void adminLoginFailed() throws Exception {
         mockMvc.perform(formLogin("/login").user("springadmin").password("wrong-password"))
                 .andExpect(unauthenticated())
+                .andDo(print());
+    }
+
+    @Test
+    void adminAccessPathOK() throws Exception {
+        mockMvc.perform(get("/admin").with(user("mockadmin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void adminAccessPathNOK() throws Exception {
+        mockMvc.perform(get("/admin").with(user("mockadmin").roles("USER")))
+                .andExpect(status().isForbidden())
                 .andDo(print());
     }
 }
