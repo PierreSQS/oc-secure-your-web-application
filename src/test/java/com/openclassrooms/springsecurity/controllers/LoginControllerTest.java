@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -76,4 +77,14 @@ class LoginControllerTest {
                 .andExpect(content().string(containsString("Welcome Admin")))
                 .andDo(print());
     }
+
+    @Test
+    void gitLoginOK() throws Exception {
+        mockMvc.perform(get("/gituser").with(oidcLogin()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Welcome Github user!"))
+                .andDo(print());
+    }
+
+
 }
